@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Exemplo de preenchimento de dados via planilha</title>
+    <!-- Documentação do XLSX: https://docs.sheetjs.com -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.4/xlsx.full.min.js"></script>
+    <script>
+      function salvar() {
+        var planilha = XLSX.utils.table_to_book(document.getElementById("tabela"));
+        XLSX.writeFile(planilha, "Planilha para preenchimento.xlsx");
+      }
+      function abrir(carregador) {
+        var leitor = new FileReader();
+        leitor.onload = function(e) {
+          var planilha = XLSX.read(e.target.result, {type: "binary"});
+          var dados = XLSX.utils.sheet_to_json(planilha.Sheets[planilha.SheetNames[0]]);
+          exibir(dados);
+        };
+        leitor.readAsBinaryString(carregador.files[0]);
+      }
+      function exibir(dados) {
+        var tabela = XLSX.utils.sheet_to_html(XLSX.utils.json_to_sheet(dados));
+        document.getElementById("tabela").innerHTML = tabela;
+      }
+    </script>
+  </head>
+  <body>
+    <input type="button" value="Obter planilha para preenchimento" onclick="salvar()"><br>
+    <input type="button" value="Enviar planilha preenchida" onclick="document.getElementById('carregador').click()"><br>
+    <input id="carregador" style="display: none" type="file" onchange="abrir(this)" accept=".xlsx">
+    <table id="tabela" border="1"><tr><td>Campo A:</td><td>Campo B:</td><td>Campo C:</td></tr></table>
+  </body>
+</html>
